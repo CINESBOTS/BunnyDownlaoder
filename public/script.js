@@ -3,6 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const configForm = document.getElementById('configForm');
     const configStatus = document.getElementById('configStatus');
     const fillDefaultValues = document.getElementById('fillDefaultValues');
+    const libraryIdInput = document.getElementById('libraryId');
+    const accessKeyInput = document.getElementById('accessKey');
+    const collectionInput = document.getElementById('collection');
     
     // Video fetcher elements
     const fetchButton = document.getElementById('fetchVideos');
@@ -16,40 +19,53 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentPage = 1;
     const itemsPerPage = 100;
     let totalPages = 1;
+
+    // Load saved credentials from localStorage if they exist
+    function loadSavedCredentials() {
+        const savedCredentials = localStorage.getItem('bunnyCdnCredentials');
+        if (savedCredentials) {
+            try {
+                const credentials = JSON.parse(savedCredentials);
+                libraryIdInput.value = credentials.libraryId || '';
+                accessKeyInput.value = credentials.accessKey || '';
+                collectionInput.value = credentials.collection || '';
+            } catch (error) {
+                console.error('Error loading saved credentials:', error);
+            }
+        }
+    }
+    
+    // Load saved credentials on page load
+    loadSavedCredentials();
     
     // Fill form with default values
     fillDefaultValues.addEventListener('click', (e) => {
         e.preventDefault();
-        document.getElementById('libraryId').value = '391954';
-        document.getElementById('accessKey').value = '10ebd9a0-af89-4244-ba0bffee63ee-e9c5-4409';
-        document.getElementById('collection').value = 'de812570-9819-411a-b993-c4dee56a6ed4';
+        libraryIdInput.value = '391954';
+        accessKeyInput.value = '10ebd9a0-af89-4244-ba0bffee63ee-e9c5-4409';
+        collectionInput.value = 'de812570-9819-411a-b993-c4dee56a6ed4';
     });
     
     // Handle configuration form submission
     configForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        const formData = {
-            libraryId: document.getElementById('libraryId').value,
-            accessKey: document.getElementById('accessKey').value,
-            collection: document.getElementById('collection').value
+        const credentials = {
+            libraryId: libraryIdInput.value.trim(),
+            accessKey: accessKeyInput.value.trim(),
+            collection: collectionInput.value.trim()
         };
         
+        // Validate inputs
+        if (!credentials.libraryId || !credentials.accessKey) {
+            configStatus.textContent = 'Error: Library ID and Access Key are required';
+            configStatus.className = 'status error';
+            return;
+        }
+        
         try {
-            configStatus.textContent = 'Saving configuration...';
-            configStatus.className = 'status pending';
-            
-            const response = await fetch('/api/config', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
-            
-            if (!response.ok) {
-                throw new Error('Failed to save configuration');
-            }
+            // Save to localStorage
+            localStorage.setItem('bunnyCdnCredentials', JSON.stringify(credentials));
             
             configStatus.textContent = 'Configuration saved successfully!';
             configStatus.className = 'status success';
@@ -83,13 +99,35 @@ document.addEventListener('DOMContentLoaded', () => {
     
     async function fetchVideos(page) {
         try {
+            // Get credentials from localStorage
+            const savedCredentials = localStorage.getItem('bunnyCdnCredentials');
+            if (!savedCredentials) {
+                throw new Error('API credentials not configured. Please set them in the configuration section.');
+            }
+            
+            const credentials = JSON.parse(savedCredentials);
+            
+            if (!credentials.libraryId || !credentials.accessKey) {
+                throw new Error('Invalid API credentials. Please check your configuration.');
+            }
+            
             // Show loading indicator
             loadingDiv.classList.remove('hidden');
             errorDiv.classList.add('hidden');
             resultsDiv.innerHTML = '';
             
             // Fetch videos from our API
-            const response = await fetch(`/api/videos?page=${page}&itemsPerPage=${itemsPerPage}`);
+            const queryParams = new URLSearchParams({
+                page,
+                libraryId: credentials.libraryId,
+                accessKey: credentials.accessKey
+            });
+            
+            if (credentials.collection) {
+                queryParams.append('collection', credentials.collection);
+            }
+            
+            const response = await fetch(`/api/videos?${queryParams.toString()}`);
             
             if (!response.ok) {
                 const errorData = await response.json();

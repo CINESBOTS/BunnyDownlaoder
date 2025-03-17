@@ -26,4 +26,32 @@ h1 {
 
 hr {
     border: 0;
-    height:
+    height: 1px;
+    background-color: #ddd;
+    margin: 20px 0;
+}
+
+/* Config Section */
+.config-section {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14

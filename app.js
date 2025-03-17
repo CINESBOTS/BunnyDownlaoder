@@ -2,7 +2,6 @@
 const express = require('express');
 const fetch = require('node-fetch');
 const path = require('path');
-const session = require('express-session');
 require('dotenv').config();
 
 const app = express();
@@ -13,49 +12,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Session for storing API credentials temporarily
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'bunnycdn-secret-key',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: process.env.NODE_ENV === 'production' }
-}));
-
 // Set EJS as templating engine
 app.set('view engine', 'ejs');
 
 // Routes
 app.get('/', (req, res) => {
-  res.render('index', {
-    config: {
-      libraryId: req.session.libraryId || '',
-      accessKey: req.session.accessKey || '',
-      collection: req.session.collection || ''
-    }
-  });
-});
-
-// Save config to session
-app.post('/api/config', (req, res) => {
-  const { libraryId, accessKey, collection } = req.body;
-  
-  req.session.libraryId = libraryId;
-  req.session.accessKey = accessKey;
-  req.session.collection = collection;
-  
-  res.json({ success: true });
+  res.render('index');
 });
 
 app.get('/api/videos', async (req, res) => {
   try {
-    // Get credentials from session
-    const libraryId = req.session.libraryId;
-    const accessKey = req.session.accessKey;
-    const collection = req.session.collection || '';
+    // Get credentials from request parameters
+    const libraryId = req.query.libraryId;
+    const accessKey = req.query.accessKey;
+    const collection = req.query.collection || '';
     
     // Check if credentials are set
     if (!libraryId || !accessKey) {
-      return res.status(400).json({ error: 'API credentials not configured. Please set them in the configuration section.' });
+      return res.status(400).json({ error: 'API credentials not provided. Please include libraryId and accessKey in your request.' });
     }
     
     const page = req.query.page || 1;
