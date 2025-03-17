@@ -55,3 +55,24 @@ hr {
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 14
+
+
+
+
+.json-container {
+    margin-top: 20px;
+}
+
+.copy-button {
+    background-color: #ff4444;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.copy-button:hover {
+    background-color: #ff6666;
+}
