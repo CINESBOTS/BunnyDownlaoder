@@ -172,29 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return new Date(dateString).toLocaleDateString();
         };
         
-        // Create video cards
-        data.items.forEach(video => {
-            const videoCard = document.createElement('div');
-            videoCard.className = 'video-card';
-            
-            const thumbnailUrl = video.thumbnailUrl || 'https://via.placeholder.com/280x160?text=No+Thumbnail';
-            
-            videoCard.innerHTML = `
-                <img src="${thumbnailUrl}" alt="${video.title}" class="thumbnail">
-                <div class="video-info">
-
-                    <div class="video-meta">
-                        <div>Date: ${formatDate(video.dateUploaded)}</div>
-                        <div>Length: ${formatDuration(video.length)}</div>
-                        <div>Storage: ${formatFileSize(video.storageSize)}</div>
-                    </div>
-                </div>
-            `;
-            
-            videoGrid.appendChild(videoCard);
-        });
-        
-        resultsDiv.appendChild(videoGrid);
+    
         
         // Add JSON output
         const jsonOutput = document.createElement('pre');
