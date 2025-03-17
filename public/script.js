@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentPage = 1;
     const itemsPerPage = 100;
     let totalPages = 1;
-
     // Load saved credentials from localStorage if they exist
     function loadSavedCredentials() {
         const savedCredentials = localStorage.getItem('bunnyCdnCredentials');
@@ -172,17 +171,50 @@ document.addEventListener('DOMContentLoaded', () => {
             return new Date(dateString).toLocaleDateString();
         };
         
-    
+        // Add JSON output with copy button
+        const jsonContainer = document.createElement('div');
+        jsonContainer.className = 'json-container';
+        
+        // Create copy button
+        const copyButton = document.createElement('button');
+        copyButton.textContent = 'Copy JSON';
+        copyButton.className = 'copy-button';
+        copyButton.style.backgroundColor = '#ff4444'; // Red button
+        copyButton.style.color = 'white';
+        copyButton.style.padding = '8px 16px';
+        copyButton.style.border = 'none';
+        copyButton.style.borderRadius = '4px';
+        copyButton.style.cursor = 'pointer';
+        copyButton.style.marginBottom = '10px';
+        
+        // Add copy functionality
+        copyButton.addEventListener('click', () => {
+            const jsonText = JSON.stringify(data, null, 2);
+            navigator.clipboard.writeText(jsonText).then(() => {
+                // Change button color to blue when clicked
+                copyButton.style.backgroundColor = '#4444ff';
+                copyButton.textContent = 'Copied!';
+                
+                // Reset button after 2 seconds
+                setTimeout(() => {
+                    copyButton.style.backgroundColor = '#ff4444';
+                    copyButton.textContent = 'Copy JSON';
+                }, 2000);
+            });
+        });
         
         // Add JSON output
         const jsonOutput = document.createElement('pre');
-        jsonOutput.style.marginTop = '20px';
+        jsonOutput.style.marginTop = '10px';
         jsonOutput.style.padding = '10px';
         jsonOutput.style.backgroundColor = '#f5f5f5';
         jsonOutput.style.overflow = 'auto';
+        jsonOutput.style.borderRadius = '4px';
         jsonOutput.textContent = JSON.stringify(data, null, 2);
         
-        resultsDiv.appendChild(jsonOutput);
+        jsonContainer.appendChild(copyButton);
+        jsonContainer.appendChild(jsonOutput);
+        resultsDiv.appendChild(jsonContainer);
     }
     
     function updatePagination() {
