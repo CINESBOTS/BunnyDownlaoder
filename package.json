@@ -1,21 +1,22 @@
 {
-    "name": "bunnycdn-video-fetcher",
-    "version": "1.0.0",
-    "description": "App to fetch videos from BunnyCDN",
-    "main": "app.js",
-    "scripts": {
-      "start": "node app.js",
-      "dev": "nodemon app.js"
-    },
-    "engines": {
-      "node": "16.x"
-    },
-    "dependencies": {
-      "dotenv": "^16.0.3",
-      "ejs": "^3.1.8",
-      "express": "^4.18.2",
-      "node-fetch": "^2.6.7"
-    },
-    "devDependencies": {
-      "nodemon": "^2.0.20"
-    }
+  "name": "bunnycdn-video-fetcher",
+  "version": "1.0.0",
+  "description": "App to fetch videos from BunnyCDN",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "engines": {
+    "node": "16.x"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.8",
+    "express": "^4.18.2",
+    "node-fetch": "^2.6.7"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
