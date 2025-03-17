@@ -29,7 +29,8 @@
             </form>
             <div id="configStatus" class="hidden"></div>
         </div>
-        
+
+
         <!-- Default values helper -->
         <div class="config-helper">
             <button id="fillDefaultValues" class="btn secondary">Fill with Example Values</button>
@@ -41,7 +42,19 @@
         </div>
         
         <hr>
-        
+        <h1>Collection Downloader </h1>
+<p><a href="https://docs.bunny.net/reference/video_list" target="_blank"><strong>GET&nbsp; IDS</strong></a></p>
+<label for="baseUrlInput">Base URL:</label><br>
+<input type="text" id="baseUrlInput" placeholder="Enter base URL"><br><br>
+<label for="jsonInput">Input JSON:</label><br>
+<textarea id="jsonInput" rows="10" cols="50"></textarea><br>
+<button onclick="filterGuid()">Filter GUID</button><br><br>
+<label for="jsonOutput">Filtered GUIDs:</label><br>
+<textarea id="jsonOutput" rows="10" cols="50" readonly></textarea><br>
+<label for="fileNameInput">File Name:</label><br>
+<input type="text" id="fileNameInput" placeholder="Enter file name"><br><br>
+<button id="downloadButton" onclick="downloadTxtFile()" disabled>Download as .txt</button>
+
         <!-- Video Fetcher Section -->
         <div class="controls">
             <button id="fetchVideos" class="btn primary">Fetch Videos</button>
@@ -59,5 +72,86 @@
         </div>
     </div>
     <script src="/script.js"></script>
+<script>
+function filterGuid() {
+    // Get the base URL manually input by the user
+    var baseUrl = document.getElementById("baseUrlInput").value.trim();
+
+    // Get the input JSON string
+    var jsonString = document.getElementById("jsonInput").value;
+
+    try {
+        // Parse the JSON string into an object
+        var data = JSON.parse(jsonString);
+
+        // Extract the 'items' array from the data
+        var items = data.items;
+
+        // Initialize an empty string to store filtered GUIDs
+        var filteredGuids = "";
+
+        // Iterate over each item and extract the 'guid' value
+        for (var i = 0; i < items.length; i++) {
+            // Prepend the base URL to each GUID
+            var guidUrl = baseUrl + items[i].guid;
+
+            // Append the desired parts to the GUID URL
+            var guidUrl_480p = guidUrl + "/play_480p.mp4";
+            var guidUrl_720p = guidUrl + "/play_720p.mp4";
+
+            // Add both URLs to the filteredGuids string
+            filteredGuids += guidUrl_480p + "\n";
+            filteredGuids += guidUrl_720p + "\n";
+        }
+
+        // Set the filtered GUIDs as the output
+        document.getElementById("jsonOutput").value = filteredGuids;
+
+        // Enable the download button
+        document.getElementById("downloadButton").disabled = false;
+    } catch (error) {
+        // If there's an error parsing the JSON, display error message
+        document.getElementById("jsonOutput").value = "Error parsing JSON: " + error.message;
+    }
+}
+
+function downloadTxtFile() {
+    // Get the content of the output textarea
+    var content = document.getElementById("jsonOutput").value;
+    
+    // Get the file name input by the user
+    var fileName = document.getElementById("fileNameInput").value.trim();
+    
+    // Check if the file name is empty
+    if (fileName === "") {
+        alert("Please enter a file name.");
+        return;
+    }
+    
+    // Replace new line breaks with Windows style line breaks
+    content = content.replace(/\n/g, "\r\n");
+    
+    // Create a Blob containing the content
+    var blob = new Blob([content], { type: "text/plain" });
+    
+    // Create a URL for the Blob
+    var url = URL.createObjectURL(blob);
+    
+    // Create a link element and set its attributes
+    var link = document.createElement("a");
+    link.href = url;
+    link.download = fileName + ".txt";
+    
+    // Append the link to the document body
+    document.body.appendChild(link);
+    
+    // Click the link to trigger the download
+    link.click();
+    
+    // Remove the link from the document body
+    document.body.removeChild(link);
+}
+</script>
+
 </body>
 </html>
