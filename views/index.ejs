@@ -9,8 +9,45 @@
 <body>
     <div class="container">
         <h1>BunnyCDN Video Library</h1>
+        
+        <!-- Configuration Section -->
+        <div class="config-section">
+            <h2>API Configuration</h2>
+            <form id="configForm">
+                <div class="form-group">
+                    <label for="libraryId">Library ID:</label>
+                    <input type="text" id="libraryId" name="libraryId" value="<%= config.libraryId %>">
+                </div>
+                <div class="form-group">
+                    <label for="accessKey">Access Key:</label>
+                    <input type="text" id="accessKey" name="accessKey" value="<%= config.accessKey %>">
+                </div>
+                <div class="form-group">
+                    <label for="collection">Collection ID (optional):</label>
+                    <input type="text" id="collection" name="collection" value="<%= config.collection %>">
+                </div>
+                <button type="submit" class="btn">Save Configuration</button>
+            </form>
+            <div id="configStatus" class="hidden"></div>
+        </div>
+        
+        <!-- Default values helper -->
+        <div class="config-helper">
+            <h3>Quick Setup</h3>
+            <button id="fillDefaultValues" class="btn secondary">Fill with Example Values</button>
+            <div class="example-values">
+                <p><strong>Example values:</strong></p>
+                <code>BUNNY_LIBRARY_ID=391954</code><br>
+                <code>BUNNY_ACCESS_KEY=10ebd9a0-af89-4244-ba0bffee63ee-e9c5-4409</code><br>
+                <code>BUNNY_COLLECTION=de812570-9819-411a-b993-c4dee56a6ed4</code>
+            </div>
+        </div>
+        
+        <hr>
+        
+        <!-- Video Fetcher Section -->
         <div class="controls">
-            <button id="fetchVideos">Fetch Videos</button>
+            <button id="fetchVideos" class="btn primary">Fetch Videos</button>
             <div class="pagination">
                 <button id="prevPage" disabled>Previous</button>
                 <span id="pageInfo">Page 1</span>
@@ -21,6 +58,7 @@
         <div id="error" class="hidden"></div>
         <div id="results">
             <p>Click "Fetch Videos" to load your BunnyCDN video library.</p>
+            <p class="note">Make sure you've configured your API credentials above before fetching videos.</p>
         </div>
     </div>
     <script src="/script.js"></script>

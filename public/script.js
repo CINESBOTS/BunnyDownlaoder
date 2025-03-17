@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Configuration form
+    const configForm = document.getElementById('configForm');
+    const configStatus = document.getElementById('configStatus');
+    const fillDefaultValues = document.getElementById('fillDefaultValues');
+    
+    // Video fetcher elements
     const fetchButton = document.getElementById('fetchVideos');
     const prevButton = document.getElementById('prevPage');
     const nextButton = document.getElementById('nextPage');
@@ -8,9 +14,58 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorDiv = document.getElementById('error');
     
     let currentPage = 1;
-    const itemsPerPage = 12;
+    const itemsPerPage = 100;
     let totalPages = 1;
     
+    // Fill form with default values
+    fillDefaultValues.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('libraryId').value = '391954';
+        document.getElementById('accessKey').value = '10ebd9a0-af89-4244-ba0bffee63ee-e9c5-4409';
+        document.getElementById('collection').value = 'de812570-9819-411a-b993-c4dee56a6ed4';
+    });
+    
+    // Handle configuration form submission
+    configForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = {
+            libraryId: document.getElementById('libraryId').value,
+            accessKey: document.getElementById('accessKey').value,
+            collection: document.getElementById('collection').value
+        };
+        
+        try {
+            configStatus.textContent = 'Saving configuration...';
+            configStatus.className = 'status pending';
+            
+            const response = await fetch('/api/config', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to save configuration');
+            }
+            
+            configStatus.textContent = 'Configuration saved successfully!';
+            configStatus.className = 'status success';
+            
+            // Hide the success message after 3 seconds
+            setTimeout(() => {
+                configStatus.className = 'hidden';
+            }, 3000);
+            
+        } catch (error) {
+            configStatus.textContent = `Error: ${error.message}`;
+            configStatus.className = 'status error';
+        }
+    });
+    
+    // Video fetcher functionality
     fetchButton.addEventListener('click', () => fetchVideos(currentPage));
     prevButton.addEventListener('click', () => {
         if (currentPage > 1) {
@@ -37,7 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`/api/videos?page=${page}&itemsPerPage=${itemsPerPage}`);
             
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                const errorData = await response.json();
+                throw new Error(errorData.error || `HTTP error! Status: ${response.status}`);
             }
             
             const data = await response.json();
@@ -59,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             loadingDiv.classList.add('hidden');
             errorDiv.classList.remove('hidden');
-            errorDiv.textContent = `Error fetching videos: ${error.message}`;
+            errorDiv.textContent = `Error: ${error.message}`;
             console.error('Error:', error);
         }
     }
@@ -133,5 +189,4 @@ document.addEventListener('DOMContentLoaded', () => {
         const mb = (bytes / (1024 * 1024)).toFixed(2);
         return `${mb} MB`;
     }
-    
 });
