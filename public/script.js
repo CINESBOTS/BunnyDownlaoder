@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentPage = 1;
     const itemsPerPage = 100;
     let totalPages = 1;
+
     // Load saved credentials from localStorage if they exist
     function loadSavedCredentials() {
         const savedCredentials = localStorage.getItem('bunnyCdnCredentials');
@@ -163,67 +164,67 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // Create a simple list display instead of a grid
-        const videoList = document.createElement('div');
-        videoList.className = 'video-list';
-        
-        // Show loading text first
-        videoList.innerHTML = '<p>Loading videos...</p>';
+        const videoGrid = document.createElement('div');
+        videoGrid.className = 'video-grid';
         
         // Format date function
         const formatDate = (dateString) => {
             return new Date(dateString).toLocaleDateString();
         };
         
-        // Create simple video entries
+        // Create video cards
         data.items.forEach(video => {
-            const videoEntry = document.createElement('div');
-            videoEntry.className = 'video-entry';
+            const videoCard = document.createElement('div');
+            videoCard.className = 'video-card';
             
-            // Format duration properly (MM:SS)
-            const length = video.length || 0;
-            const minutes = Math.floor(length / 60);
-            const seconds = length % 60;
-            const formattedLength = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            const thumbnailUrl = video.thumbnailUrl || 'https://via.placeholder.com/280x160?text=No+Thumbnail';
             
-            // Format storage size in MB
-            const storageMB = ((video.storageSize || 0) / (1024 * 1024)).toFixed(2);
-            
-            videoEntry.innerHTML = `
-                <div class="video-title">${video.title || 'Untitled'}</div>
-                <div>Date: ${formatDate(video.dateUploaded)}</div>
-                <div>Length: ${formattedLength}</div>
-                <div>Storage: ${storageMB} MB</div>
+            videoCard.innerHTML = `
+                <img src="${thumbnailUrl}" alt="${video.title}" class="thumbnail">
+                <div class="video-info">
+
+                    <div class="video-meta">
+                        <div>Date: ${formatDate(video.dateUploaded)}</div>
+                        <div>Length: ${formatDuration(video.length)}</div>
+                        <div>Storage: ${formatFileSize(video.storageSize)}</div>
+                    </div>
+                </div>
             `;
             
-            videoList.appendChild(videoEntry);
+            videoGrid.appendChild(videoCard);
         });
         
-        // Replace loading text with the video list
-        resultsDiv.innerHTML = '';
-        resultsDiv.appendChild(videoList);
+        resultsDiv.appendChild(videoGrid);
         
-        // Add hidden JSON data for debugging or export
-        const jsonData = document.createElement('div');
-        jsonData.className = 'hidden-json-data';
-        jsonData.style.display = 'none';
+        // Add JSON output
+        const jsonOutput = document.createElement('pre');
+        jsonOutput.style.marginTop = '20px';
+        jsonOutput.style.padding = '10px';
+        jsonOutput.style.backgroundColor = '#f5f5f5';
+        jsonOutput.style.overflow = 'auto';
+        jsonOutput.textContent = JSON.stringify(data, null, 2);
         
-        // Store only the necessary fields
-        const simplifiedData = data.items.map(video => ({
-            guid: video.guid,
-            title: video.title,
-            dateUploaded: video.dateUploaded,
-            length: video.length,
-            storageSize: video.storageSize
-        }));
-        
-        jsonData.textContent = JSON.stringify(simplifiedData, null, 2);
-        resultsDiv.appendChild(jsonData);
+        resultsDiv.appendChild(jsonOutput);
     }
     
     function updatePagination() {
         pageInfoSpan.textContent = `Page ${currentPage} of ${totalPages}`;
         prevButton.disabled = currentPage <= 1;
         nextButton.disabled = currentPage >= totalPages;
+    }
+    
+    function formatDuration(seconds) {
+        if (!seconds) return 'N/A';
+        
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+    
+    function formatFileSize(bytes) {
+        if (!bytes) return '0 MB';
+        
+        const mb = (bytes / (1024 * 1024)).toFixed(2);
+        return `${mb} MB`;
     }
 });
