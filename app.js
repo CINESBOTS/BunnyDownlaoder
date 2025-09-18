@@ -33,7 +33,7 @@ app.get('/api/videos', async (req, res) => {
     }
     
     const page = req.query.page || 1;
-    const itemsPerPage = 100; // Fixed at 100 items per page
+    const itemsPerPage = 1000; // Fixed at 100 items per page
     
     let url = `https://video.bunnycdn.com/library/${libraryId}/videos?page=${page}&itemsPerPage=${itemsPerPage}&orderBy=date`;
     
